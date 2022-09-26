@@ -1,0 +1,82 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Multi User Display</title>
+  </head>
+  <body>
+    <button id="showAllUsers" type="button"> DISPLAY USERS</button>
+    <hr />
+
+    <div id="ajaxResponseContent"></div>
+    <hr />
+
+    <table id="userDetails"></table>
+
+    <script>
+      (function () {
+        let httpRequest;
+
+        document
+          .getElementById("showAllUsers")
+          .addEventListener("click", displayAllUsers);
+
+        function displayAllUsers() {
+          httpRequest = new XMLHttpRequest();
+
+          if (!httpRequest) {
+            alert("request failed");
+            return false;
+          }
+          httpRequest.onreadystatechange = displayAllEmployees;
+          httpRequest.open("GET", "https://reqres.in/api/users?page=2");
+          httpRequest.send();
+        }
+
+        function displayAllEmployees() {
+          try {
+            document.getElementById("userDetails").innerHTML = "";
+            document.getElementById("ajaxResponseContent").innerText = "No Data";
+
+         tbody = `<tr><th>ID</th>
+                <th>E-mail</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Avatar</th>
+                </tr>`
+
+            if (httpRequest.readyState === XMLHttpRequest.DONE) {
+              if (httpRequest.status === 200) {
+                console.log(httpRequest.responseText);
+                let users = JSON.parse(httpRequest.responseText);
+                
+                console.log(users);
+               
+                for(let i = 0; i < users.data.length; i++) {
+                    let obj = users.data[i];
+                    tbody += `<tr> 
+                      <td>${obj.id} </td>
+                        <td>${obj.email} </td>
+                          <td>${obj.first_name} </td>
+                            <td>${obj.last_name} </td>
+                              <td><img src="${obj.avatar}"alt="user avatar" /> </td>
+                    </tr>`
+                }
+                document.getElementById("userDetails").innerHTML = tbody;
+                document.getElementById("userDetails").border = "1";
+              } else {
+                console.error("Request has problems");
+              }
+            }
+          } catch (e) {
+            console.error(e);
+            alert("exception->" + e.description);
+          }
+        }
+      })();
+    </script>
+  </body>
+</html>
